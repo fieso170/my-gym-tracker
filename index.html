@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gym Tracker</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      max-width: 450px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      letter-spacing: 1px;
+    }
+    .form-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      color: #fff;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    input::placeholder { color: #888; }
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+    button:hover { background: #ccc; }
+    .log-list { margin-top: 2rem; }
+    .log-item {
+      background: #1e1e1e;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 4px solid #fff;
+    }
+    .exercise-name { font-weight: bold; display: block; margin-bottom: 0.2rem; }
+    .stats { color: #aaa; font-size: 0.9rem; }
+    .time { font-size: 0.8rem; color: #666; }
+  </style>
+</head>
+<body>
+
+  <h1>GYM TRACKER</h1>
+  
+  <form id="gymForm">
+    <div style="margin-bottom: 1rem;">
+      <input type="text" id="exercise" placeholder="Exercise (e.g. Bench Press)" required>
+    </div>
+    <div class="form-group">
+      <input type="number" id="weight" placeholder="Weight (kg)" required min="0" step="0.5">
+      <input type="number" id="reps" placeholder="Reps" required min="1">
+    </div>
+    <button type="submit">Log Set</button>
+  </form>
+
+  <div class="log-list" id="logList"></div>
+
+  <script>
+    const form = document.getElementById('gymForm');
+    const logList = document.getElementById('logList');
+    const logs = JSON.parse(localStorage.getItem('gym_logs')) || [];
+
+    function render() {
+      logList.innerHTML = logs.map(log => `
+        <div class="log-item">
+          <div>
+            <span class="exercise-name">${log.exercise}</span>
+            <span class="stats">${log.weight} kg × ${log.reps} reps</span>
+          </div>
+          <span class="time">${log.time}</span>
+        </div>
+      `).join('');
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const exercise = document.getElementById('exercise').value;
+      const weight = document.getElementById('weight').value;
+      const reps = document.getElementById('reps').value;
+      
+      const now = new Date();
+      const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+      logs.unshift({ exercise, weight, reps, time });
+      localStorage.setItem('gym_logs', JSON.stringify(logs));
+      
+      document.getElementById('weight').value = '';
+      document.getElementById('reps').value = '';
+      document.getElementById('weight').focus();
+      
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
